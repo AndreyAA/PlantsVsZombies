@@ -36,7 +36,7 @@ public class Zombie {
                     }
                     slowInt--;
                 } else {
-                    posX -= 1;
+                    posX -= speed;
                 }
             } else {
                 collided.assignedPlant.setHealth(collided.assignedPlant.getHealth() - 10);
@@ -48,6 +48,7 @@ public class Zombie {
                 isMoving = false;
                 JOptionPane.showMessageDialog(gp, "ZOMBIES ATE YOUR BRAIN !" + '\n' + "Starting the level again");
                 GameWindow.gw.dispose();
+                gp.release();
                 GameWindow.gw = new GameWindow();
             }
         }

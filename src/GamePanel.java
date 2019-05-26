@@ -48,6 +48,16 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
         sunScoreboard.setText(String.valueOf(sunScore));
     }
 
+    public void release() {
+        laneZombies.clear();
+        lanePeas.clear();
+        activeSuns.clear();
+        redrawTimer.stop();
+        advancerTimer.stop();
+        sunProducer.stop();
+        zombieProducer.stop();
+    }
+
     public GamePanel(JLabel sunScoreboard) {
         setSize(1000, 752);
         setLayout(null);
@@ -104,7 +114,7 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
         advancerTimer = new Timer(60, (ActionEvent e) -> advance());
         advancerTimer.start();
 
-        sunProducer = new Timer(5000, (ActionEvent e) -> {
+        sunProducer = new Timer(2000, (ActionEvent e) -> {// todo restore it
             Random rnd = new Random();
             Sun sta = new Sun(this, rnd.nextInt(800) + 100, 0, rnd.nextInt(300) + 200);
             activeSuns.add(sta);
