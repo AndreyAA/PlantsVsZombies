@@ -52,6 +52,7 @@ public class GameWindow extends JFrame {
 
         getLayeredPane().add(sun, new Integer(2));
         setResizable(false);
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
@@ -63,6 +64,7 @@ public class GameWindow extends JFrame {
         getLayeredPane().add(menu, new Integer(0));
         menu.repaint();
         setResizable(false);
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
