@@ -5,7 +5,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by Armin on 6/25/2016.
@@ -23,9 +25,9 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
     private Image coneHeadZombieImage;
     private Collider[] colliders;
 
-    private ArrayList<ArrayList<Zombie>> laneZombies;
-    private ArrayList<ArrayList<Pea>> lanePeas;
-    private ArrayList<Sun> activeSuns;
+    private List<List<Zombie>> laneZombies;
+    private List<List<Pea>> lanePeas;
+    private List<Sun> activeSuns;
 
     private Timer redrawTimer;
     private Timer advancerTimer;
@@ -38,6 +40,7 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
     private int mouseX, mouseY;
 
     private int sunScore;
+    private boolean isLogEnabled = false;
 
     public int getSunScore() {
         return sunScore;
@@ -49,8 +52,8 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
     }
 
     public void release() {
-        laneZombies.clear();
-        lanePeas.clear();
+        laneZombies.forEach(List::clear);
+        lanePeas.forEach(List::clear);
         activeSuns.clear();
         redrawTimer.stop();
         advancerTimer.stop();
@@ -77,18 +80,18 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
         coneHeadZombieImage = new ImageIcon(this.getClass().getResource("images/zombies/zombie2.png")).getImage();
 
         laneZombies = new ArrayList<>();
-        laneZombies.add(new ArrayList<>()); //line 1
-        laneZombies.add(new ArrayList<>()); //line 2
-        laneZombies.add(new ArrayList<>()); //line 3
-        laneZombies.add(new ArrayList<>()); //line 4
-        laneZombies.add(new ArrayList<>()); //line 5
+        laneZombies.add(new CopyOnWriteArrayList<>()); //line 1
+        laneZombies.add(new CopyOnWriteArrayList<>()); //line 2
+        laneZombies.add(new CopyOnWriteArrayList<>()); //line 3
+        laneZombies.add(new CopyOnWriteArrayList<>()); //line 4
+        laneZombies.add(new CopyOnWriteArrayList<>()); //line 5
 
         lanePeas = new ArrayList<>();
-        lanePeas.add(new ArrayList<>()); //line 1
-        lanePeas.add(new ArrayList<>()); //line 2
-        lanePeas.add(new ArrayList<>()); //line 3
-        lanePeas.add(new ArrayList<>()); //line 4
-        lanePeas.add(new ArrayList<>()); //line 5
+        lanePeas.add(new CopyOnWriteArrayList<>()); //line 1
+        lanePeas.add(new CopyOnWriteArrayList<>()); //line 2
+        lanePeas.add(new CopyOnWriteArrayList<>()); //line 3
+        lanePeas.add(new CopyOnWriteArrayList<>()); //line 4
+        lanePeas.add(new CopyOnWriteArrayList<>()); //line 5
 
         colliders = new Collider[45];
         for (int i = 0; i < 45; i++) {
@@ -142,6 +145,7 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
     }
 
     private void advance() {
+        logItems();
         for (int i = 0; i < 5; i++) {
             for (Zombie z : laneZombies.get(i)) {
                 z.advance();
@@ -158,6 +162,13 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
             activeSuns.get(i).advance();
         }
 
+    }
+
+    private void logItems() {
+        if (isLogEnabled) {
+            System.err.println("zombies: " + laneZombies.stream().mapToLong(List::size).sum() +
+                    ", peas: " + lanePeas.stream().mapToLong(List::size).sum() + ", suns: " + activeSuns.size());
+        }
     }
 
     @Override
@@ -286,27 +297,27 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
         this.activePlantingBrush = activePlantingBrush;
     }
 
-    public ArrayList<ArrayList<Zombie>> getLaneZombies() {
+    public List<List<Zombie>> getLaneZombies() {
         return laneZombies;
     }
 
-    public void setLaneZombies(ArrayList<ArrayList<Zombie>> laneZombies) {
+    public void setLaneZombies(List<List<Zombie>> laneZombies) {
         this.laneZombies = laneZombies;
     }
 
-    public ArrayList<ArrayList<Pea>> getLanePeas() {
+    public List<List<Pea>> getLanePeas() {
         return lanePeas;
     }
 
-    public void setLanePeas(ArrayList<ArrayList<Pea>> lanePeas) {
+    public void setLanePeas(List<List<Pea>> lanePeas) {
         this.lanePeas = lanePeas;
     }
 
-    public ArrayList<Sun> getActiveSuns() {
+    public List<Sun> getActiveSuns() {
         return activeSuns;
     }
 
-    public void setActiveSuns(ArrayList<Sun> activeSuns) {
+    public void setActiveSuns(List<Sun> activeSuns) {
         this.activeSuns = activeSuns;
     }
 

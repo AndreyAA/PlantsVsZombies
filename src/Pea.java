@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -20,8 +21,8 @@ public class Pea {
     public void advance() {
         Rectangle pRect = new Rectangle(posX, 130 + myLane * 120, 28, 28);
         boolean exit = false;
-        for (int i = 0; i < gp.getLaneZombies().get(myLane).size(); i++) {
-            Zombie z = gp.getLaneZombies().get(myLane).get(i);
+        List<Zombie> myLaneZombies = gp.getLaneZombies().get(myLane);
+        for (Zombie z: myLaneZombies) {
             Rectangle zRect = new Rectangle(z.getPosX(), 109 + myLane * 120, 400, 120);
             if (pRect.intersects(zRect)) {
                 z.setHealth(z.getHealth() - 300);
@@ -29,10 +30,8 @@ public class Pea {
                 if (z.getHealth() < 0) {
                     System.out.println("ZOMBIE DIED");
 
-                    gp.getLaneZombies().get(myLane).remove(i);
+                    myLaneZombies.remove(z);
                     GamePanel.setProgress(10);
-
-                    gp.getLaneZombies().get(myLane).remove(this);
                 }
                 gp.getLanePeas().get(myLane).remove(this);
                 break;
@@ -47,7 +46,7 @@ public class Pea {
             posX += 15;
         }
 
-        if (posX > 2000) {
+        if (posX > 1000) {
                 gp.getLanePeas().get(myLane).remove(this);
         }
     }
