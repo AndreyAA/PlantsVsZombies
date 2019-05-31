@@ -6,13 +6,6 @@ import java.awt.event.ActionEvent;
  */
 public class GameWindow extends JFrame {
 
-    enum PlantType {
-        None,
-        Sunflower,
-        Peashooter,
-        FreezePeashooter
-    }
-
     //PlantType activePlantingBrush = PlantType.None;
 
     public GameWindow() {
@@ -28,32 +21,24 @@ public class GameWindow extends JFrame {
         gp.setLocation(0, 0);
         getLayeredPane().add(gp, new Integer(0));
 
-        PlantCard sunflower = new PlantCard(new ImageIcon(this.getClass().getResource("images/cards/card_sunflower.png")).getImage());
-        sunflower.setLocation(110, 8);
-        sunflower.setAction((ActionEvent e) -> {
-            gp.setActivePlantingBrush(PlantType.Sunflower);
-        });
-        getLayeredPane().add(sunflower, new Integer(3));
-
-        PlantCard peashooter = new PlantCard(new ImageIcon(this.getClass().getResource("images/cards/card_peashooter.png")).getImage());
-        peashooter.setLocation(175, 8);
-        peashooter.setAction((ActionEvent e) -> {
-            gp.setActivePlantingBrush(PlantType.Peashooter);
-        });
-        getLayeredPane().add(peashooter, new Integer(3));
-
-        PlantCard freezepeashooter = new PlantCard(new ImageIcon(this.getClass().getResource("images/cards/card_freezepeashooter.png")).getImage());
-        freezepeashooter.setLocation(240, 8);
-        freezepeashooter.setAction((ActionEvent e) -> {
-            gp.setActivePlantingBrush(PlantType.FreezePeashooter);
-        });
-        getLayeredPane().add(freezepeashooter, new Integer(3));
-
+        addCard(gp, GameData.CARD_SUN_FLOWER);
+        addCard(gp, GameData.CARD_PEAR_SHOOTER);
+        addCard(gp, GameData.CARD_FREEZE_SHOOTER);
 
         getLayeredPane().add(sun, new Integer(2));
+
         setResizable(false);
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+
+    private void addCard(GamePanel gamePanel, GameData.Card card) {
+        PlantCard plantCard = new PlantCard(new ImageIcon(this.getClass().getResource(card.getImage())).getImage());
+        plantCard.setLocation(card.getX(), card.getY());
+        plantCard.setAction((ActionEvent e) -> {
+            gamePanel.setActivePlantingBrush(card.getType());
+        });
+        getLayeredPane().add(plantCard, new Integer(3));
     }
 
     public GameWindow(boolean b) {

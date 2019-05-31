@@ -35,7 +35,7 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
     private Timer zombieProducer;
     private JLabel sunScoreboard;
 
-    private GameWindow.PlantType activePlantingBrush = GameWindow.PlantType.None;
+    private PlantType activePlantingBrush = PlantType.None;
 
     private int mouseX, mouseY;
 
@@ -66,7 +66,7 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
         setLayout(null);
         addMouseMotionListener(this);
         this.sunScoreboard = sunScoreboard;
-        setSunScore(150);  //pool avalie
+        setSunScore(GameData.INITIAL_SCORE);  //pool avalie
 
         bgImage = new ImageIcon(this.getClass().getResource("images/mainBG.png")).getImage();
 
@@ -235,26 +235,27 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (activePlantingBrush == GameWindow.PlantType.Sunflower) {
-                if (getSunScore() >= 50) {
+
+            if (activePlantingBrush == PlantType.Sunflower) {
+                if (getSunScore() >= GameData.CARD_SUN_FLOWER.getPrice()) {
                     colliders[x + y * 9].setPlant(new Sunflower(GamePanel.this, x, y));
-                    setSunScore(getSunScore() - 50);
+                    setSunScore(getSunScore() - GameData.CARD_SUN_FLOWER.getPrice());
                 }
             }
-            if (activePlantingBrush == GameWindow.PlantType.Peashooter) {
-                if (getSunScore() >= 100) {
+            if (activePlantingBrush == PlantType.Peashooter) {
+                if (getSunScore() >= GameData.CARD_PEAR_SHOOTER.getPrice()) {
                     colliders[x + y * 9].setPlant(new Peashooter(GamePanel.this, x, y));
-                    setSunScore(getSunScore() - 100);
+                    setSunScore(getSunScore() - GameData.CARD_PEAR_SHOOTER.getPrice());
                 }
             }
 
-            if (activePlantingBrush == GameWindow.PlantType.FreezePeashooter) {
-                if (getSunScore() >= 175) {
+            if (activePlantingBrush == PlantType.FreezePeashooter) {
+                if (getSunScore() >= GameData.CARD_FREEZE_SHOOTER.getPrice()) {
                     colliders[x + y * 9].setPlant(new FreezePeashooter(GamePanel.this, x, y));
-                    setSunScore(getSunScore() - 175);
+                    setSunScore(getSunScore() - GameData.CARD_FREEZE_SHOOTER.getPrice());
                 }
             }
-            activePlantingBrush = GameWindow.PlantType.None;
+            activePlantingBrush = PlantType.None;
         }
     }
 
@@ -289,11 +290,11 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
         }
     }
 
-    public GameWindow.PlantType getActivePlantingBrush() {
+    public PlantType getActivePlantingBrush() {
         return activePlantingBrush;
     }
 
-    public void setActivePlantingBrush(GameWindow.PlantType activePlantingBrush) {
+    public void setActivePlantingBrush(PlantType activePlantingBrush) {
         this.activePlantingBrush = activePlantingBrush;
     }
 
