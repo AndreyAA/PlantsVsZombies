@@ -5,7 +5,8 @@ import javax.swing.*;
  */
 public class Zombie {
 
-    private int health = 1000;
+    private int maxHealth = 1000;
+    private int health = maxHealth;
     private int speed = 2;
 
     private GamePanel gp;
@@ -17,6 +18,10 @@ public class Zombie {
     public Zombie(GamePanel parent, int lane) {
         this.gp = parent;
         myLane = lane;
+    }
+
+    public int getMaxHealth() {
+        return maxHealth;
     }
 
     public void advance() {

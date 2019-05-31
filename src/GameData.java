@@ -4,6 +4,7 @@ public class GameData {
     public static Card CARD_PEAR_SHOOTER = new Card(2, PlantType.Peashooter, "images/cards/card_peashooter.png", 100, 178, 8);
     public static Card CARD_FREEZE_SHOOTER = new Card(3, PlantType.FreezePeashooter, "images/cards/card_freezepeashooter.png", 175, 240, 8);
     public static int INITIAL_SCORE = 150;
+    public static boolean SHOW_ENEMY_HEALTH = true;
 
     public static class Card {
         private final int pos;

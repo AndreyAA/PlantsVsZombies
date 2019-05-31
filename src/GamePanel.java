@@ -200,6 +200,11 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
                 } else if (z instanceof ConeHeadZombie) {
                     g.drawImage(coneHeadZombieImage, z.getPosX(), 109 + (i * 120), null);
                 }
+                if (GameData.SHOW_ENEMY_HEALTH) {
+                    g.setColor(Color.RED);
+                    g.fillRoundRect(z.getPosX()+ 15, 109 + (i * 120) - 10,
+                            (int)(30.0*z.getHealth()/z.getMaxHealth()), 5, 2,2);
+                }
             }
 
             for (int j = 0; j < lanePeas.get(i).size(); j++) {
