@@ -17,7 +17,7 @@ public class GameWindow extends JFrame {
         sun.setLocation(37, 80);
         sun.setSize(60, 20);
 
-        GamePanel gp = new GamePanel(sun);
+        GamePanel gp = new GamePanel(sun, new LevelData());
         gp.setLocation(0, 0);
         getLayeredPane().add(gp, new Integer(0));
 

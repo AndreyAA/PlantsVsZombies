@@ -31,7 +31,7 @@ public class Pea {
                     System.out.println("ZOMBIE DIED");
 
                     myLaneZombies.remove(z);
-                    GamePanel.setProgress(10);
+                    gp.addProgress(1);
                 }
                 gp.getLanePeas().get(myLane).remove(this);
                 break;

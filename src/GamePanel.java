@@ -41,27 +41,13 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
 
     private int sunScore;
     private boolean isLogEnabled = false;
+    LevelInfoIcon levelInfo = new LevelInfoIcon();
+    private final LevelData levelData;
+    int progress = 0;
+    int zombiesSpawned = 0;
 
-    public int getSunScore() {
-        return sunScore;
-    }
-
-    public void setSunScore(int sunScore) {
-        this.sunScore = sunScore;
-        sunScoreboard.setText(String.valueOf(sunScore));
-    }
-
-    public void release() {
-        laneZombies.forEach(List::clear);
-        lanePeas.forEach(List::clear);
-        activeSuns.clear();
-        redrawTimer.stop();
-        advancerTimer.stop();
-        sunProducer.stop();
-        zombieProducer.stop();
-    }
-
-    public GamePanel(JLabel sunScoreboard) {
+    public GamePanel(JLabel sunScoreboard, LevelData levelData) {
+        this.levelData = levelData;
         setSize(1000, 752);
         setLayout(null);
         addMouseMotionListener(this);
@@ -118,30 +104,40 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
         advancerTimer.start();
 
         sunProducer = new Timer(2000, (ActionEvent e) -> {// todo restore it
-            Random rnd = new Random();
-            Sun sta = new Sun(this, rnd.nextInt(800) + 100, 0, rnd.nextInt(300) + 200);
-            activeSuns.add(sta);
-            add(sta, new Integer(1));
+            produceSun();
         });
         sunProducer.start();
 
         zombieProducer = new Timer(7000, (ActionEvent e) -> {
-            Random rnd = new Random();
-            LevelData lvl = new LevelData();
-            String[] Level = lvl.LEVEL_CONTENT[Integer.parseInt(lvl.LEVEL_NUMBER) - 1];
-            int[][] LevelValue = lvl.LEVEL_VALUE[Integer.parseInt(lvl.LEVEL_NUMBER) - 1];
-            int l = rnd.nextInt(5);
-            int t = rnd.nextInt(100);
-            Zombie z = null;
-            for (int i = 0; i < LevelValue.length; i++) {
-                if (t >= LevelValue[i][0] && t <= LevelValue[i][1]) {
-                    z = Zombie.getZombie(Level[i], GamePanel.this, l);
-                }
-            }
-            laneZombies.get(l).add(z);
+            produceZombie(levelData);
         });
         zombieProducer.start();
 
+    }
+
+    private void produceSun() {
+        Random rnd = new Random();
+        Sun sta = new Sun(this, rnd.nextInt(800) + 100, 0, rnd.nextInt(300) + 200);
+        activeSuns.add(sta);
+        add(sta, new Integer(1));
+    }
+
+    private void produceZombie(LevelData levelData) {
+        if (levelData.getLevelComplete()<=zombiesSpawned) {
+            return;// no more zombies for this level
+        }
+        Random rnd = new Random();
+        int[][] levelValue = levelData.getLevelValue();
+        int row = rnd.nextInt(5);
+        int rndValue = rnd.nextInt(100);
+        Zombie z = null;
+        for (int i = 0; i < levelValue.length; i++) {
+            if (rndValue >= levelValue[i][0] && rndValue <= levelValue[i][1]) {
+                z = Zombie.getZombie(levelData.getLevelContent()[i], GamePanel.this, row);
+            }
+        }
+        zombiesSpawned++;
+        laneZombies.get(row).add(z);
     }
 
     private void advance() {
@@ -162,6 +158,29 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
             activeSuns.get(i).advance();
         }
 
+    }
+
+
+    public int getSunScore() {
+        return sunScore;
+    }
+
+    public void setSunScore(int sunScore) {
+        this.sunScore = sunScore;
+        sunScoreboard.setText(String.valueOf(sunScore));
+    }
+
+    public void stopTimers() {
+        redrawTimer.stop();
+        advancerTimer.stop();
+        sunProducer.stop();
+        zombieProducer.stop();
+    }
+
+    public void release() {
+        laneZombies.forEach(List::clear);
+        lanePeas.forEach(List::clear);
+        activeSuns.clear();
     }
 
     private void logItems() {
@@ -217,6 +236,9 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
             }
 
         }
+
+        levelInfo.paintIcon(null, g, 600, 20);
+        updateLevelInfo();
 
         //if(!"".equals(activePlantingBrush)){
         //System.out.println(activePlantingBrush);
@@ -275,20 +297,29 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
         mouseY = e.getY();
     }
 
-    static int progress = 0;
+    private void updateLevelInfo() {
+        levelInfo.setInfo(levelData.getCurrentLevel(), levelData.getRequiredProgress()-progress);
+    }
 
-    public static void setProgress(int num) {
+    public void addProgress(int num) {
         progress = progress + num;
         System.out.println(progress);
-        if (progress >= 150) {
-            if ("1".equals(LevelData.LEVEL_NUMBER)) {
-                JOptionPane.showMessageDialog(null, "LEVEL_CONTENT Completed !!!" + '\n' + "Starting next LEVEL_CONTENT");
+        updateLevelInfo();
+        if (progress >= levelData.getRequiredProgress()) {
+            if (1 == levelData.getCurrentLevel()) {
+                stopTimers();
+                JOptionPane.showMessageDialog(null,
+                        "LEVEL_CONTENT Completed !!!" + '\n' + "Starting next LEVEL_CONTENT");
                 GameWindow.gw.dispose();
-                LevelData.write("2");
+                release();
+                levelData.write(2);
                 GameWindow.gw = new GameWindow();
             } else {
-                JOptionPane.showMessageDialog(null, "LEVEL_CONTENT Completed !!!" + '\n' + "More Levels will come soon !!!" + '\n' + "Resetting data");
-                LevelData.write("1");
+                stopTimers();
+                JOptionPane.showMessageDialog(null,
+                        "LEVEL_CONTENT Completed !!!" + '\n' + "More Levels will come soon !!!" + '\n' + "Resetting data");
+                release();
+                levelData.write(1);
                 System.exit(0);
             }
             progress = 0;
@@ -334,4 +365,31 @@ public class GamePanel extends JLayeredPane implements MouseMotionListener {
     public void setColliders(Collider[] colliders) {
         this.colliders = colliders;
     }
+
+public static class LevelInfoIcon implements Icon {
+
+    private String info = "Level 1:";
+
+    public void setInfo(int level, int remainZombies) {
+        this.info = "Level " + level + ": " + remainZombies;
+    }
+
+    @Override
+    public void paintIcon(Component c, Graphics g, int x, int y) {
+        g.setFont(new Font(Font.SERIF, Font.BOLD, 22));
+        g.setColor(Color.BLACK);
+
+        g.drawString(info, 870,23);
+    }
+
+    @Override
+    public int getIconWidth() {
+        return 50;
+    }
+
+    @Override
+    public int getIconHeight() {
+        return 20;
+    }
+}
 }
